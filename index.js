@@ -23,10 +23,12 @@ const client = new MongoClient(uri, {
 async function run() {
 	try {
 		// Connect the client to the server	(optional starting in v4.7)
-		await client.connect();
+		// await client.connect();
 
 		const toyCollection = client.db("babyToy").collection("toys");
+		const addCollection = client.db("babyToy").collection("addtoys");
 
+		// toys
 		app.get("/toys", async (req, res) => {
 			const cursor = toyCollection.find();
 			const result = await cursor.toArray();
@@ -40,6 +42,7 @@ async function run() {
 			const options = {
 				// Include only the `title` and `imdb` fields in the returned document
 				projection: {
+					_id: 1,
 					img: 1,
 					name: 1,
 					seller: 1,
@@ -51,6 +54,14 @@ async function run() {
 			};
 
 			const result = await toyCollection.findOne(query, options);
+			res.send(result);
+		});
+
+		// addtoys
+		app.post("/addtoys", async (req, res) => {
+			const addtoy = req.body;
+			console.log(addtoy);
+			const result = await addCollection.insertOne(addtoy);
 			res.send(result);
 		});
 
