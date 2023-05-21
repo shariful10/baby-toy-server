@@ -35,10 +35,24 @@ async function run() {
 
 		app.get("/toys/:id", async (req, res) => {
 			const id = req.params.id;
-			const query = {_id: new ObjectId(id)};
-			const result = await toyCollection.findOne(query);
+			const query = { _id: new ObjectId(id) };
+
+			const options = {
+				// Include only the `title` and `imdb` fields in the returned document
+				projection: {
+					img: 1,
+					name: 1,
+					seller: 1,
+					price: 1,
+					rating: 1,
+					category: 1,
+					quantity: 1,
+				},
+			};
+
+			const result = await toyCollection.findOne(query, options);
 			res.send(result);
-		})
+		});
 
 		// Send a ping to confirm a successful connection
 		await client.db("admin").command({ ping: 1 });
