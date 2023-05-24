@@ -40,7 +40,6 @@ async function run() {
 			const query = { _id: new ObjectId(id) };
 
 			const options = {
-				// Include only the `title` and `imdb` fields in the returned document
 				projection: {
 					_id: 1,
 					img: 1,
@@ -50,6 +49,8 @@ async function run() {
 					rating: 1,
 					category: 1,
 					quantity: 1,
+					email: 1,
+					desc: 1,
 				},
 			};
 
@@ -64,7 +65,30 @@ async function run() {
 			if (req.query?.email) {
 				query = { email: req.query.email };
 			}
-			const result = await addCollection.find().toArray();
+			const result = await addCollection.find(query).toArray();
+			res.send(result);
+		});
+
+		app.get("/addtoys/:id", async (req, res) => {
+			const id = req.params.id;
+			const query = { _id: new ObjectId(id) };
+
+			const options = {
+				projection: {
+					_id: 1,
+					img: 1,
+					name: 1,
+					seller: 1,
+					price: 1,
+					rating: 1,
+					category: 1,
+					quantity: 1,
+					email: 1,
+					desc: 1,
+				},
+			};
+
+			const result = await addCollection.findOne(query, options);
 			res.send(result);
 		});
 
@@ -75,17 +99,25 @@ async function run() {
 			res.send(result);
 		});
 
-		app.patch("/addtoys/:id", async (req, res) => {
+		app.put("/addtoys/:id", async (req, res) => {
 			const id = req.params.id;
 			const filter = { _id: new ObjectId(id) };
+			const option = { upsert: true };
 			const updatedToy = req.body;
 			console.log(updatedToy);
-			const updateDoc = {
+			const addToy = {
 				$set: {
-					status: updatedToy.status,
+					name: updatedToy.name,
+					seller: updatedToy.seller,
+					price: updatedToy.price,
+					quantity: updatedToy.quantity,
+					email: updatedToy.email,
+					img: updatedToy.img,
+					rating: updatedToy.rating,
+					description: updatedToy.description,
 				},
 			};
-			const result = await addCollection.updateOne(filter, updateDoc);
+			const result = await addCollection.updateOne(filter, addToy, option);
 			res.send(result);
 		});
 
